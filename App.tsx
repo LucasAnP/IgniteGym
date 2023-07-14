@@ -1,10 +1,13 @@
-import { StatusBar, Text, View } from "react-native";
+import { StatusBar, View, LogBox } from "react-native";
 import { NativeBaseProvider } from "native-base";
 import {
   useFonts,
   Roboto_400Regular,
   Roboto_700Bold,
 } from "@expo-google-fonts/roboto";
+import { THEME } from "./src/theme";
+import { Loading } from "./src/components/Loading";
+import { SignIn } from "@screens/SignIn";
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -13,13 +16,13 @@ export default function App() {
   });
 
   return (
-    <NativeBaseProvider>
+    <NativeBaseProvider isSSR theme={THEME}>
       <StatusBar
         barStyle="light-content"
         backgroundColor="transparent"
         translucent
       />
-      {fontsLoaded ? <View /> : <View />}
+      {fontsLoaded ? <SignIn /> : <Loading />}
     </NativeBaseProvider>
   );
 }
