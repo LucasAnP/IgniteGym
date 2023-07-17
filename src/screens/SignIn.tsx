@@ -2,6 +2,7 @@ import { VStack, Image, Text, Center, Heading } from "native-base";
 
 import BackgroundImg from "@assets/background.png";
 import LogoSvg from "@assets/logo.svg";
+import { Input } from "@components/Input";
 
 export function SignIn() {
   return (
@@ -21,6 +22,12 @@ export function SignIn() {
       <Heading color="gray.100" fontSize="xl" mb="6" fontFamily="heading">
         Access your account
       </Heading>
+      <Input
+        placeholder="E-mail"
+        keyboardType="email-address"
+        autoCapitalize="none"
+      />
+      <Input placeholder="Password" secureTextEntry />
     </VStack>
   );
 }
