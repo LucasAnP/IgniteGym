@@ -30,7 +30,7 @@ export function History() {
         )}
         ListEmptyComponent={() => (
           <Text color={"gray.100"} textAlign={"center"}>
-            There are no registered exercises yet. {"\n"} Shall we exercise
+            There are no registered exercises yet.{"\n"} Shall we exercise
             today?
           </Text>
         )}
@@ -38,6 +38,7 @@ export function History() {
           exercises.length === 0 && { flex: 1, justifyContent: "center" }
         }
         px={8}
+        showsHorizontalScrollIndicator={false}
       />
     </VStack>
   );
