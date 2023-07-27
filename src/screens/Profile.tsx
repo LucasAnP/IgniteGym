@@ -10,6 +10,7 @@ import {
   Skeleton,
   Text,
   VStack,
+  useToast,
 } from "native-base";
 import { Alert, TouchableOpacity } from "react-native";
 import { Input } from "@components/Input";
@@ -20,6 +21,8 @@ const PHOTO_SIZE = 33;
 export function Profile() {
   const [userPhoto, setUserPhoto] = useState("https://github.com/lucasAnP.png");
   const [photoIsLoading, setPhotoIsLoading] = useState(false);
+
+  const toast = useToast();
 
   async function handleUserPhotoSelect() {
     setPhotoIsLoading(true);
@@ -36,9 +39,11 @@ export function Profile() {
           photoSelected?.assets[0]?.uri
         );
         if (photoInfo?.size && photoInfo?.size / 1024 / 1024 > 5) {
-          return Alert.alert(
-            "Essa imagem é muito grande. Escolha uma de ate 5MB"
-          );
+          return toast.show({
+            title: "Very large image, try another.",
+            placement: "top",
+            bgColor: "red.500",
+          });
         }
         setUserPhoto(photoSelected.assets[0].uri);
       }
