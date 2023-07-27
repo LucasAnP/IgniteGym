@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ScreenHeader } from "@components/ScreenHeader";
 import { UserPhoto } from "@components/UserPhoto";
 import * as ImagePicker from "expo-image-picker";
+import * as FileSystem from "expo-file-system";
 import {
   Center,
   Heading,
@@ -10,7 +11,7 @@ import {
   Text,
   VStack,
 } from "native-base";
-import { TouchableOpacity } from "react-native";
+import { Alert, TouchableOpacity } from "react-native";
 import { Input } from "@components/Input";
 import { Button } from "@components/Button";
 
@@ -21,17 +22,32 @@ export function Profile() {
   const [photoIsLoading, setPhotoIsLoading] = useState(false);
 
   async function handleUserPhotoSelect() {
-    const photoSelected = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 1,
-      aspect: [4, 4],
-      allowsEditing: true,
-    });
+    setPhotoIsLoading(true);
+    try {
+      const photoSelected = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        quality: 1,
+        aspect: [4, 4],
+        allowsEditing: true,
+      });
 
-    if (!photoSelected.canceled) {
-      setUserPhoto(photoSelected.assets[0].uri);
+      if (!photoSelected.canceled && photoSelected?.assets[0]?.uri) {
+        const photoInfo = await FileSystem.getInfoAsync(
+          photoSelected?.assets[0]?.uri
+        );
+        if (photoInfo?.size && photoInfo?.size / 1024 / 1024 > 5) {
+          return Alert.alert(
+            "Essa imagem é muito grande. Escolha uma de ate 5MB"
+          );
+        }
+        setUserPhoto(photoSelected.assets[0].uri);
+      }
+      return;
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setPhotoIsLoading(false);
     }
-    return;
   }
 
   return (
