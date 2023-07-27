@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { HStack, VStack, FlatList, Heading, Text } from "native-base";
+import { useNavigation } from "@react-navigation/native";
 
 import { ExerciseCard } from "@components/ExerciseCard";
 import { Group } from "@components/Group";
 import { HomeHeader } from "@components/HomeHeader";
+import { AppNavigationRoutesProps } from "@routes/app.routes";
 
 export function Home() {
   const [groups, setGroups] = useState([
@@ -20,6 +22,11 @@ export function Home() {
     "Levantamento Terra",
   ]);
   const [groupSelected, setGroupSelected] = useState("back");
+  const navigation = useNavigation<AppNavigationRoutesProps>();
+
+  function handleOpenExerciseDetails() {
+    navigation.navigate("exercise");
+  }
 
   return (
     <VStack flex={1}>
@@ -53,7 +60,9 @@ export function Home() {
         <FlatList
           data={exercises}
           keyExtractor={(item) => item}
-          renderItem={({ item }) => <ExerciseCard title={item} />}
+          renderItem={({ item }) => (
+            <ExerciseCard title={item} onPress={handleOpenExerciseDetails} />
+          )}
           showsVerticalScrollIndicator={false}
           _contentContainerStyle={{ paddingBottom: 20 }}
         />

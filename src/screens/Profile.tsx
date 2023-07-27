@@ -16,11 +16,11 @@ import { Button } from "@components/Button";
 const PHOTO_SIZE = 33;
 
 export function Profile() {
-  const [photoIsLoading, setPhotoIsLoading] = useState("");
+  const [photoIsLoading, setPhotoIsLoading] = useState(false);
   return (
     <VStack flex={1}>
       <ScreenHeader title={"Profile"} />
-      <ScrollView>
+      <ScrollView _contentContainerStyle={{ paddingBottom: 36 }}>
         <Center mt={6} px={10}>
           {photoIsLoading ? (
             <Skeleton
