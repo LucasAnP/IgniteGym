@@ -17,15 +17,21 @@ import { Button } from "@components/Button";
 const PHOTO_SIZE = 33;
 
 export function Profile() {
+  const [userPhoto, setUserPhoto] = useState("https://github.com/lucasAnP.png");
   const [photoIsLoading, setPhotoIsLoading] = useState(false);
 
   async function handleUserPhotoSelect() {
-    await ImagePicker.launchImageLibraryAsync({
+    const photoSelected = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 1,
       aspect: [4, 4],
       allowsEditing: true,
     });
+
+    if (!photoSelected.canceled) {
+      setUserPhoto(photoSelected.assets[0].uri);
+    }
+    return;
   }
 
   return (
@@ -43,7 +49,7 @@ export function Profile() {
             />
           ) : (
             <UserPhoto
-              source={{ uri: "https://github.com/lucasAnP.png" }}
+              source={{ uri: userPhoto }}
               alt="User picture"
               size={PHOTO_SIZE}
             />
