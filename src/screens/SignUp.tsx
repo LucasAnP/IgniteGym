@@ -16,7 +16,11 @@ type FormDataProps = {
 
 export function SignUp() {
   const navigation = useNavigation();
-  const { control, handleSubmit } = useForm<FormDataProps>();
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormDataProps>();
 
   function handleGoBack() {
     navigation.goBack();
@@ -55,14 +59,29 @@ export function SignUp() {
           <Controller
             control={control}
             name="name"
+            rules={{
+              required: "This field is required.",
+            }}
             render={({ field: { onChange, value } }) => (
-              <Input placeholder="Name" value={value} onChangeText={onChange} />
+              <Input
+                placeholder="Name"
+                value={value}
+                onChangeText={onChange}
+                errorMessage={errors.name?.message}
+              />
             )}
           />
 
           <Controller
             control={control}
             name="email"
+            rules={{
+              required: "This field is required.",
+              pattern: {
+                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                message: "Invalid E-mail",
+              },
+            }}
             render={({ field: { onChange, value } }) => (
               <Input
                 placeholder="E-mail"
@@ -70,6 +89,7 @@ export function SignUp() {
                 autoCapitalize="none"
                 onChangeText={onChange}
                 value={value}
+                errorMessage={errors.email?.message}
               />
             )}
           />
@@ -77,6 +97,9 @@ export function SignUp() {
           <Controller
             control={control}
             name="password"
+            rules={{
+              required: "This field is required.",
+            }}
             render={({ field: { onChange, value } }) => (
               <Input
                 placeholder="Password"
@@ -90,6 +113,9 @@ export function SignUp() {
           <Controller
             control={control}
             name="password_confirm"
+            rules={{
+              required: "This field is required.",
+            }}
             render={({ field: { onChange, value } }) => (
               <Input
                 placeholder="Confirm password"
