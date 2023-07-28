@@ -1,21 +1,33 @@
 import { VStack, Image, Text, Center, Heading, ScrollView } from "native-base";
+import { useForm, Controller } from "react-hook-form";
 import { useNavigation } from "@react-navigation/native";
 
 import BackgroundImg from "@assets/background.png";
 import LogoSvg from "@assets/logo.svg";
 import { Input } from "@components/Input";
 import { Button } from "@components/Button";
-import { useForm, Controller } from "react-hook-form";
+
+type FormDataProps = {
+  name: string;
+  email: string;
+  password: string;
+  password_confirm: string;
+};
 
 export function SignUp() {
   const navigation = useNavigation();
-  const { control } = useForm();
+  const { control, handleSubmit } = useForm<FormDataProps>();
 
   function handleGoBack() {
     navigation.goBack();
   }
 
-  function handleSignUp() {}
+  function handleSignUp({
+    name,
+    email,
+    password,
+    password_confirm,
+  }: FormDataProps) {}
 
   return (
     <ScrollView
@@ -84,11 +96,16 @@ export function SignUp() {
                 secureTextEntry
                 onChangeText={onChange}
                 value={value}
+                onSubmitEditing={handleSubmit(handleSignUp)}
+                returnKeyType="send"
               />
             )}
           />
 
-          <Button title="Create and access" onPress={handleSignUp} />
+          <Button
+            title="Create and access"
+            onPress={handleSubmit(handleSignUp)}
+          />
         </Center>
 
         <Button
