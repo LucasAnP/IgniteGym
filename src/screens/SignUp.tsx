@@ -1,6 +1,8 @@
 import { VStack, Image, Text, Center, Heading, ScrollView } from "native-base";
 import { useForm, Controller } from "react-hook-form";
 import { useNavigation } from "@react-navigation/native";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 import BackgroundImg from "@assets/background.png";
 import LogoSvg from "@assets/logo.svg";
@@ -14,13 +16,34 @@ type FormDataProps = {
   password_confirm: string;
 };
 
+const signUpSchema = yup.object({
+  name: yup.string().required("Inform the name."),
+  email: yup
+    .string()
+    .required("Inform the email.")
+    .email("Invalid E-mail Address."),
+  password: yup
+    .string()
+    .required("Inform the password.")
+    .min(6, "The password may have 6 digits."),
+  password_confirm: yup
+    .string()
+    .required("Confirm the password.")
+    .oneOf(
+      [yup.ref("password")],
+      "The confirmation of the password is required."
+    ),
+});
+
 export function SignUp() {
   const navigation = useNavigation();
   const {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormDataProps>();
+  } = useForm<FormDataProps>({
+    resolver: yupResolver(signUpSchema),
+  });
 
   function handleGoBack() {
     navigation.goBack();
@@ -59,9 +82,6 @@ export function SignUp() {
           <Controller
             control={control}
             name="name"
-            rules={{
-              required: "This field is required.",
-            }}
             render={({ field: { onChange, value } }) => (
               <Input
                 placeholder="Name"
@@ -75,13 +95,6 @@ export function SignUp() {
           <Controller
             control={control}
             name="email"
-            rules={{
-              required: "This field is required.",
-              pattern: {
-                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                message: "Invalid E-mail",
-              },
-            }}
             render={({ field: { onChange, value } }) => (
               <Input
                 placeholder="E-mail"
@@ -106,6 +119,7 @@ export function SignUp() {
                 secureTextEntry
                 onChangeText={onChange}
                 value={value}
+                errorMessage={errors.password?.message}
               />
             )}
           />
@@ -124,6 +138,7 @@ export function SignUp() {
                 value={value}
                 onSubmitEditing={handleSubmit(handleSignUp)}
                 returnKeyType="send"
+                errorMessage={errors.password_confirm?.message}
               />
             )}
           />
