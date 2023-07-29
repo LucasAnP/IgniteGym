@@ -49,14 +49,14 @@ export function SignUp() {
     navigation.goBack();
   }
 
-  function handleSignUp({
+  async function handleSignUp({
     name,
     email,
     password,
     password_confirm,
   }: FormDataProps) {
     // 192.168.100.1
-    fetch("http://192.168.100.69:3333/users", {
+    const response = await fetch("http://192.168.100.69:3333/users", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -66,11 +66,10 @@ export function SignUp() {
         email,
         password,
       }),
-    })
-      .then((response) => response.json())
-      .then((responseData) => console.log(responseData));
+    });
+    const data = await response.json();
 
-    console.log({ name, email, password });
+    console.log(data);
   }
 
   return (
