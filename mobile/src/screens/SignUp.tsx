@@ -55,7 +55,6 @@ export function SignUp() {
     password,
     password_confirm,
   }: FormDataProps) {
-    // 192.168.100.1
     const response = await fetch("http://192.168.100.69:3333/users", {
       method: "POST",
       headers: {
