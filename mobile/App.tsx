@@ -5,9 +5,11 @@ import {
   Roboto_400Regular,
   Roboto_700Bold,
 } from "@expo-google-fonts/roboto";
+
+import { AuthContext } from "@contexts/AuthContext";
+
 import { THEME } from "./src/theme";
 import { Loading } from "./src/components/Loading";
-import { SignUp } from "@screens/SignUp";
 import { Routes } from "@routes/index";
 
 export default function App() {
@@ -23,7 +25,16 @@ export default function App() {
         backgroundColor="transparent"
         translucent
       />
-      {fontsLoaded ? <Routes /> : <Loading />}
+      <AuthContext.Provider
+        value={{
+          id: "1",
+          name: "Lucas",
+          email: "lucas.antonio@dcx.ufpb.br",
+          avatar: "lucas.png",
+        }}
+      >
+        {fontsLoaded ? <Routes /> : <Loading />}
+      </AuthContext.Provider>
     </NativeBaseProvider>
   );
 }
