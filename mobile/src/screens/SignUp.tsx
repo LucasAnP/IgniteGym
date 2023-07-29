@@ -54,7 +54,24 @@ export function SignUp() {
     email,
     password,
     password_confirm,
-  }: FormDataProps) {}
+  }: FormDataProps) {
+    // 192.168.100.1
+    fetch("http://192.168.100.69:3333/users", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name,
+        email,
+        password,
+      }),
+    })
+      .then((response) => response.json())
+      .then((responseData) => console.log(responseData));
+
+    console.log({ name, email, password });
+  }
 
   return (
     <ScrollView
