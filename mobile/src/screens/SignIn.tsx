@@ -1,5 +1,6 @@
-import { useNavigation } from "@react-navigation/native";
+import { Controller, useForm } from "react-hook-form";
 import { VStack, Image, Text, Center, Heading, ScrollView } from "native-base";
+import { useNavigation } from "@react-navigation/native";
 
 import { AuthNavigatorroutesProps } from "@routes/auth.routes";
 
@@ -8,12 +9,29 @@ import LogoSvg from "@assets/logo.svg";
 
 import { Input } from "@components/Input";
 import { Button } from "@components/Button";
+import { useAuth } from "@hooks/useAuth";
+
+type FormData = {
+  email: string;
+  password: string;
+};
 
 export function SignIn() {
   const navigation = useNavigation<AuthNavigatorroutesProps>();
+  const { signIn } = useAuth();
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>();
 
   function handleNewAccount() {
     navigation.navigate("signUp");
+  }
+
+  function handleSignIn({ email, password }: FormData) {
+    signIn(email, password);
   }
 
   return (
@@ -39,13 +57,34 @@ export function SignIn() {
           <Heading color="gray.100" fontSize="xl" mb="6" fontFamily="heading">
             Access your account
           </Heading>
-          <Input
-            placeholder="E-mail"
-            keyboardType="email-address"
-            autoCapitalize="none"
+          <Controller
+            control={control}
+            name="email"
+            rules={{ required: "Inform the e-mail" }}
+            render={({ field: { onChange } }) => (
+              <Input
+                placeholder="E-mail"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                onChangeText={onChange}
+                errorMessage={errors.email?.message}
+              />
+            )}
           />
-          <Input placeholder="Password" secureTextEntry />
-          <Button title="Access" />
+          <Controller
+            control={control}
+            name="password"
+            rules={{ required: "Inform the password" }}
+            render={({ field: { onChange } }) => (
+              <Input
+                placeholder="Password"
+                secureTextEntry
+                onChangeText={onChange}
+                errorMessage={errors.password?.message}
+              />
+            )}
+          />
+          <Button title="Access" onPress={handleSubmit(handleSignIn)} />
         </Center>
         <Center mt={24}>
           <Text color={"gray.100"} fontSize={"sm"} mb={3} fontFamily={"body"}>
