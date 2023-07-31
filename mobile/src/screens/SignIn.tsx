@@ -1,5 +1,13 @@
 import { Controller, useForm } from "react-hook-form";
-import { VStack, Image, Text, Center, Heading, ScrollView } from "native-base";
+import {
+  VStack,
+  Image,
+  Text,
+  Center,
+  Heading,
+  ScrollView,
+  useToast,
+} from "native-base";
 import { useNavigation } from "@react-navigation/native";
 
 import { AuthNavigatorroutesProps } from "@routes/auth.routes";
@@ -10,6 +18,8 @@ import LogoSvg from "@assets/logo.svg";
 import { Input } from "@components/Input";
 import { Button } from "@components/Button";
 import { useAuth } from "@hooks/useAuth";
+import { AppError } from "@utils/AppError";
+import { useState } from "react";
 
 type FormData = {
   email: string;
@@ -18,7 +28,10 @@ type FormData = {
 
 export function SignIn() {
   const navigation = useNavigation<AuthNavigatorroutesProps>();
+
+  const [isLoading, setIsLoading] = useState(false);
   const { signIn } = useAuth();
+  const toast = useToast();
 
   const {
     control,
@@ -30,8 +43,25 @@ export function SignIn() {
     navigation.navigate("signUp");
   }
 
-  function handleSignIn({ email, password }: FormData) {
-    signIn(email, password);
+  async function handleSignIn({ email, password }: FormData) {
+    try {
+      setIsLoading(true);
+      await signIn(email, password);
+    } catch (error) {
+      const isAppRerror = error instanceof AppError;
+
+      const title = isAppRerror
+        ? error.message
+        : "Unable to sign in. Try again later.";
+
+      toast.show({
+        title,
+        placement: "bottom",
+        bgColor: "red.500",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -84,7 +114,11 @@ export function SignIn() {
               />
             )}
           />
-          <Button title="Access" onPress={handleSubmit(handleSignIn)} />
+          <Button
+            title="Access"
+            onPress={handleSubmit(handleSignIn)}
+            isLoading={isLoading}
+          />
         </Center>
         <Center mt={24}>
           <Text color={"gray.100"} fontSize={"sm"} mb={3} fontFamily={"body"}>
