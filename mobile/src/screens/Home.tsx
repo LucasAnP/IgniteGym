@@ -8,12 +8,14 @@ import { HomeHeader } from "@components/HomeHeader";
 import { AppNavigationRoutesProps } from "@routes/app.routes";
 import { AppError } from "@utils/AppError";
 import { api } from "@services/api";
+import { ExerciseDTO } from "@dtos/ExerciseDTO";
 
 export function Home() {
-  const [groups, setGroups] = useState([]);
+  const [groups, setGroups] = useState<string[]>([]);
 
-  const [exercises, setExercises] = useState([]);
+  const [exercises, setExercises] = useState<ExerciseDTO[]>([]);
   const [groupSelected, setGroupSelected] = useState("back");
+
   const navigation = useNavigation<AppNavigationRoutesProps>();
   const toast = useToast();
 
@@ -39,7 +41,7 @@ export function Home() {
   async function fetchExercisesByGroup() {
     try {
       const response = await api.get(`/exercises/bygroup/${groupSelected}`);
-      console.log(response.data);
+      setExercises(response.data);
     } catch (error) {
       const isAppError = error instanceof AppError;
       const title = isAppError ? error.message : "Unable to load the exercises";
@@ -93,9 +95,9 @@ export function Home() {
 
         <FlatList
           data={exercises}
-          keyExtractor={(item) => item}
+          keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <ExerciseCard title={item} onPress={handleOpenExerciseDetails} />
+            <ExerciseCard data={item} onPress={handleOpenExerciseDetails} />
           )}
           showsVerticalScrollIndicator={false}
           _contentContainerStyle={{ paddingBottom: 20 }}
