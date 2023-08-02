@@ -1,32 +1,65 @@
-import { useState } from "react";
-import { HStack, VStack, FlatList, Heading, Text } from "native-base";
-import { useNavigation } from "@react-navigation/native";
+import { useCallback, useEffect, useState } from "react";
+import { HStack, VStack, FlatList, Heading, Text, useToast } from "native-base";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
 import { ExerciseCard } from "@components/ExerciseCard";
 import { Group } from "@components/Group";
 import { HomeHeader } from "@components/HomeHeader";
 import { AppNavigationRoutesProps } from "@routes/app.routes";
+import { AppError } from "@utils/AppError";
+import { api } from "@services/api";
 
 export function Home() {
-  const [groups, setGroups] = useState([
-    "Back",
-    "Biceps",
-    "Triceps",
-    "Shoulders",
-  ]);
+  const [groups, setGroups] = useState([]);
 
-  const [exercises, setExercises] = useState([
-    "Puxada Frontal",
-    "Remada Curvada",
-    "Remada unilateral",
-    "Levantamento Terra",
-  ]);
+  const [exercises, setExercises] = useState([]);
   const [groupSelected, setGroupSelected] = useState("back");
   const navigation = useNavigation<AppNavigationRoutesProps>();
+  const toast = useToast();
 
   function handleOpenExerciseDetails() {
     navigation.navigate("exercise");
   }
+
+  async function fetchGroups() {
+    try {
+      const response = await api.get("/groups");
+      setGroups(response.data);
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+      const title = isAppError ? error.message : "Unable to load muscle groups";
+      toast.show({
+        title,
+        placement: "bottom",
+        bgColor: "red.500",
+      });
+    }
+  }
+
+  async function fetchExercisesByGroup() {
+    try {
+      const response = await api.get(`/exercises/bygroup/${groupSelected}`);
+      console.log(response.data);
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+      const title = isAppError ? error.message : "Unable to load the exercises";
+      toast.show({
+        title,
+        placement: "bottom",
+        bgColor: "red.500",
+      });
+    }
+  }
+
+  useEffect(() => {
+    fetchGroups();
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchExercisesByGroup();
+    }, [groupSelected])
+  );
 
   return (
     <VStack flex={1}>
