@@ -1,5 +1,6 @@
 import { HistoryCard } from "@components/HistoryCard";
 import { ScreenHeader } from "@components/ScreenHeader";
+import { HistoryByDayDTO } from "@dtos/HistoryByDayDTO";
 import { useFocusEffect } from "@react-navigation/native";
 import { api } from "@services/api";
 import { AppError } from "@utils/AppError";
@@ -8,24 +9,14 @@ import { useCallback, useState } from "react";
 
 export function History() {
   const [isLoading, setIsLoading] = useState(true);
-  const [exercises, setExercises] = useState([
-    {
-      title: "26.08.22",
-      data: ["Puxada Frontal", "Remada unilateral"],
-    },
-
-    {
-      title: "27.08.22",
-      data: ["Puxada Frontal"],
-    },
-  ]);
+  const [exercises, setExercises] = useState<HistoryByDayDTO[]>([]);
   const toast = useToast();
 
   async function fetchHistory() {
     try {
       setIsLoading(true);
       const response = await api.get("/history");
-      console.log(response.data);
+      setExercises(response.data);
     } catch (error) {
       const isAppError = error instanceof AppError;
       const title = isAppError ? error.message : "Unable to load the exercises";
