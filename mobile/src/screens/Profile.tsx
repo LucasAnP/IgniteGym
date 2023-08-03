@@ -41,7 +41,13 @@ const profileSchema = yup.object({
     .string()
     .nullable()
     .transform((value) => (!!value ? value : null))
-    .oneOf([yup.ref("password")], "The passwords didn't match."),
+    .oneOf([yup.ref("password")], "The passwords didn't match.")
+    .when("password", {
+      is: (Field: any) => Field,
+      // if is not null, makes confirm password required
+      then: (schema) =>
+        schema.nullable().required("Inform the password again."),
+    }),
 });
 
 export function Profile() {
@@ -60,6 +66,11 @@ export function Profile() {
       email: user.email,
     },
     resolver: yupResolver(profileSchema),
+  } as {
+    defaultValues: {
+      name: string;
+      email: string;
+    };
   });
 
   async function handleUserPhotoSelect() {
