@@ -2,8 +2,10 @@ import { useState } from "react";
 import { ScreenHeader } from "@components/ScreenHeader";
 import { UserPhoto } from "@components/UserPhoto";
 import { Controller, useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
+import * as yup from "yup";
 import {
   Center,
   Heading,
@@ -24,9 +26,23 @@ type FormDataProps = {
   name: string;
   email: string;
   password: string;
-  oldPassword: string;
-  confirmPassword: string;
+  old_password: string;
+  confirm_password: string;
 };
+
+const profileSchema = yup.object({
+  name: yup.string().required("Inform the name."),
+  password: yup
+    .string()
+    .min(6, "The password must be at least 6 characters long.")
+    .nullable()
+    .transform((value) => (!!value ? value : null)),
+  confirm_password: yup
+    .string()
+    .nullable()
+    .transform((value) => (!!value ? value : null))
+    .oneOf([yup.ref("password")], "The passwords didn't match."),
+});
 
 export function Profile() {
   const [userPhoto, setUserPhoto] = useState("https://github.com/lucasAnP.png");
@@ -34,11 +50,16 @@ export function Profile() {
 
   const toast = useToast();
   const { user } = useAuth();
-  const { control } = useForm<FormDataProps>({
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormDataProps>({
     defaultValues: {
       name: user.name,
       email: user.email,
     },
+    resolver: yupResolver(profileSchema),
   });
 
   async function handleUserPhotoSelect() {
@@ -70,6 +91,10 @@ export function Profile() {
     } finally {
       setPhotoIsLoading(false);
     }
+  }
+
+  async function handleProfileUpdate(data: FormDataProps) {
+    console.log(data);
   }
 
   return (
@@ -113,6 +138,7 @@ export function Profile() {
                 placeholder="Name"
                 onChangeText={onChange}
                 value={value}
+                errorMessage={errors.name?.message}
               />
             )}
           />
@@ -140,14 +166,54 @@ export function Profile() {
           >
             Change password
           </Heading>
-          <Input bg={"gray.600"} placeholder="Old password" secureTextEntry />
-          <Input bg={"gray.600"} placeholder="New password" secureTextEntry />
-          <Input
-            bg={"gray.600"}
-            placeholder="Confirm new password"
-            secureTextEntry
+          <Controller
+            control={control}
+            name="old_password"
+            render={({ field: { value, onChange } }) => (
+              <Input
+                bg={"gray.600"}
+                placeholder="Old password"
+                secureTextEntry
+                onChangeText={onChange}
+                value={value}
+              />
+            )}
           />
-          <Button title="Update" mt={4} />
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { value, onChange } }) => (
+              <Input
+                bg={"gray.600"}
+                placeholder="New password"
+                secureTextEntry
+                onChangeText={onChange}
+                value={value}
+                errorMessage={errors.password?.message}
+              />
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="confirm_password"
+            render={({ field: { value, onChange } }) => (
+              <Input
+                bg={"gray.600"}
+                placeholder="Confirm new password"
+                secureTextEntry
+                onChangeText={onChange}
+                value={value}
+                errorMessage={errors.confirm_password?.message}
+              />
+            )}
+          />
+
+          <Button
+            title="Update"
+            mt={4}
+            onPress={handleSubmit(handleProfileUpdate)}
+          />
         </VStack>
       </ScrollView>
     </VStack>
