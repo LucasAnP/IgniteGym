@@ -24,12 +24,14 @@ import { AppError } from "@utils/AppError";
 
 import { ExerciseDTO } from "@dtos/ExerciseDTO";
 import { api } from "@services/api";
+import { Loading } from "@components/Loading";
 
 type RouteParamsProps = {
   exerciseId: string;
 };
 
 export function Exercise() {
+  const [isLoading, setIsLoading] = useState(true);
   const [exercise, setExercise] = useState<ExerciseDTO>({} as ExerciseDTO);
   const navigation = useNavigation<AppNavigationRoutesProps>();
 
@@ -44,6 +46,7 @@ export function Exercise() {
 
   async function fetchExerciseDetails() {
     try {
+      setIsLoading(true);
       const response = await api.get(`/exercises/${exerciseId}`);
       setExercise(response.data);
     } catch (error) {
@@ -56,6 +59,8 @@ export function Exercise() {
         placement: "bottom",
         bgColor: "red.500",
       });
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -94,7 +99,9 @@ export function Exercise() {
         </HStack>
       </VStack>
 
-      <ScrollView>
+      {isLoading ? (
+        <Loading />
+      ) : (
         <VStack p={8}>
           <Box rounded="lg" mb={3} overflow="hidden">
             <Image
@@ -134,7 +141,7 @@ export function Exercise() {
             <Button title={"Mark as done"} />
           </Box>
         </VStack>
-      </ScrollView>
+      )}
     </VStack>
   );
 }
