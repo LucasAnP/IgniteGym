@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ScreenHeader } from "@components/ScreenHeader";
 import { UserPhoto } from "@components/UserPhoto";
+import { Controller, useForm } from "react-hook-form";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
 import {
@@ -12,17 +13,33 @@ import {
   VStack,
   useToast,
 } from "native-base";
-import { Alert, TouchableOpacity } from "react-native";
+import { TouchableOpacity } from "react-native";
 import { Input } from "@components/Input";
 import { Button } from "@components/Button";
+import { useAuth } from "@hooks/useAuth";
 
 const PHOTO_SIZE = 33;
+
+type FormDataProps = {
+  name: string;
+  email: string;
+  password: string;
+  oldPassword: string;
+  confirmPassword: string;
+};
 
 export function Profile() {
   const [userPhoto, setUserPhoto] = useState("https://github.com/lucasAnP.png");
   const [photoIsLoading, setPhotoIsLoading] = useState(false);
 
   const toast = useToast();
+  const { user } = useAuth();
+  const { control } = useForm<FormDataProps>({
+    defaultValues: {
+      name: user.name,
+      email: user.email,
+    },
+  });
 
   async function handleUserPhotoSelect() {
     setPhotoIsLoading(true);
@@ -38,7 +55,7 @@ export function Profile() {
         const photoInfo = await FileSystem.getInfoAsync(
           photoSelected?.assets[0]?.uri
         );
-        if (photoInfo?.size && photoInfo?.size / 1024 / 1024 > 5) {
+        if (photoInfo.exists && photoInfo?.size / 1024 / 1024 > 5) {
           return toast.show({
             title: "Very large image, try another.",
             placement: "top",
@@ -86,12 +103,32 @@ export function Profile() {
               Change photo
             </Text>
           </TouchableOpacity>
-          <Input placeholder="Name" bg={"gray.600"} />
-          <Input
-            isDisabled
-            bg={"gray.600"}
-            placeholder="E-mail"
-            value="lucas.antonio@dcx.ufpb.br"
+
+          <Controller
+            control={control}
+            name="name"
+            render={({ field: { value, onChange } }) => (
+              <Input
+                bg={"gray.600"}
+                placeholder="Name"
+                onChangeText={onChange}
+                value={value}
+              />
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="email"
+            render={({ field: { value, onChange } }) => (
+              <Input
+                bg={"gray.600"}
+                placeholder="E-mail"
+                onChangeText={onChange}
+                value={value}
+                isDisabled
+              />
+            )}
           />
         </Center>
         <VStack px={10} mt={12} mb={9}>
