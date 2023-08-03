@@ -9,7 +9,7 @@ import {
   ScrollView,
 } from "native-base";
 import { TouchableOpacity } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { AppNavigationRoutesProps } from "@routes/app.routes";
 import { Feather } from "@expo/vector-icons";
 
@@ -18,8 +18,15 @@ import SeriesSvg from "@assets/series.svg";
 import RepetitionsSvg from "@assets/repetitions.svg";
 import { Button } from "@components/Button";
 
+type RouteParamsProps = {
+  exerciseId: string;
+};
+
 export function Exercise() {
   const navigation = useNavigation<AppNavigationRoutesProps>();
+
+  const route = useRoute();
+  const { exerciseId } = route.params as RouteParamsProps;
 
   function handleGoBack() {
     navigation.goBack();
@@ -86,7 +93,7 @@ export function Exercise() {
               </HStack>
 
               <HStack>
-                <SeriesSvg />
+                <RepetitionsSvg />
                 <Text color={"gray.200"} ml={2}>
                   12 repetitions
                 </Text>
