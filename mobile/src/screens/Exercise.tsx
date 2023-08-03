@@ -31,6 +31,7 @@ type RouteParamsProps = {
 };
 
 export function Exercise() {
+  const [sendingRegister, setSendingRegister] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [exercise, setExercise] = useState<ExerciseDTO>({} as ExerciseDTO);
   const navigation = useNavigation<AppNavigationRoutesProps>();
@@ -61,6 +62,34 @@ export function Exercise() {
       });
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  async function handleRegisterExerciseHistory() {
+    try {
+      setSendingRegister(true);
+
+      await api.post("/history", { exercise_id: exerciseId });
+
+      toast.show({
+        title: "Congratulations! Exercise was registered in the history!",
+        placement: "bottom",
+        bgColor: "green.700",
+      });
+
+      navigation.navigate("history");
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+      const title = isAppError
+        ? error.message
+        : "Unable to register the exercise";
+      toast.show({
+        title,
+        placement: "bottom",
+        bgColor: "red.500",
+      });
+    } finally {
+      setSendingRegister(false);
     }
   }
 
@@ -138,7 +167,11 @@ export function Exercise() {
               </HStack>
             </HStack>
 
-            <Button title={"Mark as done"} />
+            <Button
+              title={"Mark as done"}
+              isLoading={sendingRegister}
+              onPress={handleRegisterExerciseHistory}
+            />
           </Box>
         </VStack>
       )}
