@@ -46,7 +46,10 @@ const profileSchema = yup.object({
       is: (Field: any) => Field,
       // if is not null, makes confirm password required
       then: (schema) =>
-        schema.nullable().required("Inform the password again."),
+        schema
+          .nullable()
+          .required("Inform the password again.")
+          .transform((value) => (!!value ? value : null)),
     }),
 });
 
