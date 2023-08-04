@@ -11,6 +11,15 @@ IgniteGym is to practice fundamentals in React Native. An application consuming 
 
 - [React Native](https://reactnative.dev/)
 - [Typescript](https://www.typescriptlang.org)
+- React-native
+- Expo
+- TypeScript
+- Async Storage
+- Native Base
+- React Hook Form
+- React Navigation
+- Yup
+- Axios
 
 ### Getting Started
 
